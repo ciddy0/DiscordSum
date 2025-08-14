@@ -1,1 +1,30 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+
+# Environment files
 .env
+*.env
+
+# SQLite database
+*.db
+*.sqlite
+*.sqlite3
+
+# Virtual environment
+.venv/
+venv/
+ENV/
+env/
+
+# Mac OS junk
+.DS_Store
+
+# Byte-compiled / optimized / DLL files
+*.so
+
+# VSCode settings
+.vscode/
