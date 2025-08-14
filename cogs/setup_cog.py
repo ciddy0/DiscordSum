@@ -64,7 +64,7 @@ class SetupCog(commands.Cog):
         else:
             embed = discord.Embed(
                 title="✅ Channel Setup Complete",
-                description=f"I will now monitor **#{channel_name}** for messages and store them for summarization. >:),
+                description=f"I will now monitor **#{channel_name}** for messages and store them for summarization. >:)",
                 color=discord.Color.green()
             )
         embed.add_field(
