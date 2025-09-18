@@ -3,6 +3,7 @@ from discord.ext import commands
 import logging
 from config import DISCORD_TOKEN
 from cogs.setup_cog import SetupCog
+from cogs.summarizer_cog import SummarizerCog
 from db.database import is_channel_monitored, store_message
 
 # Configure logging
@@ -62,6 +63,7 @@ async def main():
     async with bot:
         # Load cogs
         await bot.add_cog(SetupCog(bot))
+        await bot.add_cog(SummarizerCog(bot))
         logger.info("Loaded cogs")
         
         # Start the bot

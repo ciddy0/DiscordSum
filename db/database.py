@@ -169,4 +169,57 @@ def get_messages(guild_id: int, channel_id: int, limit: int = 100,
             LIMIT ? OFFSET ?
         ''', (guild_id, channel_id, limit, offset))
         return [dict(row) for row in cursor.fetchall()]
+
+def get_messages_by_timeframe(guild_id: int, channel_id: int, hours: int, limit: int = 1000) -> list:
+    """Get stored messages for a channel within the specified timeframe"""
+    from datetime import datetime, timedelta
     
+    cutoff_time = datetime.now() - timedelta(hours=hours)
+    
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT * FROM stored_messages 
+            WHERE guild_id = ? AND channel_id = ? AND timestamp >= ?
+            ORDER BY timestamp ASC
+            LIMIT ?
+        ''', (guild_id, channel_id, cutoff_time.isoformat(), limit))
+        return [dict(row) for row in cursor.fetchall()]
+
+def get_message_stats(guild_id: int, channel_id: int, hours: int = None) -> dict:
+    """Get message statistics for a channel, optionally within timeframe"""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        
+        if hours:
+            from datetime import datetime, timedelta
+            cutoff_time = datetime.now() - timedelta(hours=hours)
+            cursor.execute('''
+                SELECT 
+                    COUNT(*) as total_messages,
+                    COUNT(DISTINCT author_id) as unique_authors,
+                    MIN(timestamp) as oldest_message,
+                    MAX(timestamp) as newest_message
+                FROM stored_messages 
+                WHERE guild_id = ? AND channel_id = ? AND timestamp >= ?
+            ''', (guild_id, channel_id, cutoff_time.isoformat()))
+        else:
+            cursor.execute('''
+                SELECT 
+                    COUNT(*) as total_messages,
+                    COUNT(DISTINCT author_id) as unique_authors,
+                    MIN(timestamp) as oldest_message,
+                    MAX(timestamp) as newest_message
+                FROM stored_messages 
+                WHERE guild_id = ? AND channel_id = ?
+            ''', (guild_id, channel_id))
+        
+        row = cursor.fetchone()
+        if row:
+            return dict(row)
+        return {
+            'total_messages': 0,
+            'unique_authors': 0, 
+            'oldest_message': None,
+            'newest_message': None
+        }
